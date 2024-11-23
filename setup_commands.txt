@@ -1,0 +1,34 @@
+1) create next.js app
+npx create-next-app@latest <app name> --typescript --tailwind --eslint
+
+2) initialize shadcn
+npx shadcn@latest init
+
+3) config fonts and base class
+app/layout.tsx
+
+4) tailwind config
+tailwind.config.ts > theme/extend/fontFamily
+
+5) install shadcn component
+npx shadcn@latest add button
+
+6) run react app
+npm run dev
+http://localhost:3000/
+
+7) add button to the page.tsx
+
+8) check if it's rendering
+
+9) customize app theme
+https://ui.shadcn.com/themes
+customize colors and others stuff, copy the code and replace it on global.css
+
+
+
+
+
+
+
+
