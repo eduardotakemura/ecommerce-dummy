@@ -137,3 +137,28 @@ export async function updateUserPaymentMethod(
     return { success: false, message: formatError(error) }
   }
 }
+
+export async function updateProfile(user: { name: string; email: string }) {
+  try {
+    const session = await auth()
+    const currentUser = await db.query.users.findFirst({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+      where: (users, { eq }) => eq(users.id, session?.user.id!),
+    })
+    if (!currentUser) throw new Error('User not found')
+
+    await db
+      .update(users)
+      .set({
+        name: user.name,
+      })
+      .where(eq(users.id, currentUser.id))
+
+    return {
+      success: true,
+      message: 'User updated successfully',
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}

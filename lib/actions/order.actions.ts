@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from '@/auth'
-import { eq, sql } from 'drizzle-orm'
+import { count, desc, eq, sql } from 'drizzle-orm'
 import { orders, orderItems, carts, products } from '@/db/schema'
 import { getMyCart } from '@/lib/actions/cart.actions'
 import { getUserById } from '@/lib/actions/user.actions'
@@ -13,6 +13,7 @@ import db from '@/db/drizzle'
 import { paypal } from '../paypal'
 import { revalidatePath } from 'next/cache'
 import { PaymentResult } from '@/types'
+import { PAGE_SIZE } from '../constants'
 
 // CREATE
 export const createOrder = async () => {
@@ -77,6 +78,33 @@ export async function getOrderById(orderId: string) {
       user: { columns: { name: true, email: true } },
     },
   })
+}
+
+export async function getMyOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number
+  page: number
+}) {
+  const session = await auth()
+  if (!session) throw new Error('User is not authenticated')
+
+  const data = await db.query.orders.findMany({
+    where: eq(orders.userId, session.user.id!),
+    orderBy: [desc(products.createdAt)],
+    limit,
+    offset: (page - 1) * limit,
+  })
+  const dataCount = await db
+    .select({ count: count() })
+    .from(orders)
+    .where(eq(orders.userId, session.user.id!))
+
+  return {
+    data,
+    totalPages: Math.ceil(dataCount[0].count / limit),
+  }
 }
 
 // UPDATE
