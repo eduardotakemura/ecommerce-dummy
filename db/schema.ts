@@ -10,7 +10,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { AdapterAccountType } from 'next-auth/adapters'
-import { CartItem } from '@/types'
+import { CartItem, ShippingAddress } from '@/types'
 import { primaryKey } from 'drizzle-orm/pg-core'
 
 // USERS
@@ -22,7 +22,9 @@ export const users = pgTable('user', {
   password: text('password'),
   emailVerified: timestamp('emailVerified', { mode: 'date' }),
   image: text('image'),
+  address: json('address').$type<ShippingAddress>(),
 })
+
 export const accounts = pgTable(
   'account',
   {
@@ -46,6 +48,7 @@ export const accounts = pgTable(
     }),
   })
 )
+
 export const sessions = pgTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
   userId: uuid('userId')
@@ -53,6 +56,7 @@ export const sessions = pgTable('session', {
     .references(() => users.id, { onDelete: 'cascade' }),
   expires: timestamp('expires', { mode: 'date' }).notNull(),
 })
+
 export const verificationTokens = pgTable(
   'verificationToken',
   {
