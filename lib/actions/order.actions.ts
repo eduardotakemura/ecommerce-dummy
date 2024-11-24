@@ -64,3 +64,14 @@ export const createOrder = async () => {
     return { success: false, message: formatError(error) }
   }
 }
+
+// GET
+export async function getOrderById(orderId: string) {
+  return await db.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+    with: {
+      orderItems: true,
+      user: { columns: { name: true, email: true } },
+    },
+  })
+}
